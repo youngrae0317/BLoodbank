@@ -1,5 +1,7 @@
 package form;
 
+import database.RecordInsertDatabase;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
@@ -88,27 +90,32 @@ public class RecordInsert extends JFrame {
         // 하단 패널: 버튼
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
 
-        // 버튼 색상 및 폰트 설정
-        Color buttonColor = new Color(100, 149, 237); // 파란색
-        Font buttonFont = new Font("맑은 고딕", Font.BOLD, 14);
-
         JButton saveButton = new JButton("저장");
-        saveButton.setBackground(buttonColor);
-        saveButton.setForeground(Color.WHITE);
-        saveButton.setFont(buttonFont);
         saveButton.addActionListener(e -> {
-            String memberId = memberIdField.getText();
-            String staffId = staffIdField.getText();
-            String year = yearField.getText();
-            String month = monthField.getText();
-            String day = dayField.getText();
+            String memberId = memberIdField.getText().trim();
+            String staffId = staffIdField.getText().trim();
+            String year = yearField.getText().trim();
+            String month = monthField.getText().trim();
+            String day = dayField.getText().trim();
             String donationType = (String) donationTypeComboBox.getSelectedItem();
-            String donationAmount = donationAmountField.getText();
-            String storageValidity = storageValidityField.getText();
-            String giftType = giftTypeField.getText();
+            String donationAmount = donationAmountField.getText().trim();
+            String storageValidity = storageValidityField.getText().trim();
+            String giftType = giftTypeField.getText().trim();
 
             // 날짜 유효성 확인
-            if (year.length() != 4 || month.length() != 2 || day.length() != 2) {
+            String donationDate;
+            try {
+                int yearValue = Integer.parseInt(year);
+                int monthValue = Integer.parseInt(month);
+                int dayValue = Integer.parseInt(day);
+
+                if (monthValue < 1 || monthValue > 12 || dayValue < 1 || dayValue > 31) {
+                    throw new NumberFormatException();
+                }
+
+                // 날짜를 "YYYY-MM-DD" 형식으로 변환
+                donationDate = String.format("%04d-%02d-%02d", yearValue, monthValue, dayValue);
+            } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(
                         RecordInsert.this,
                         "헌혈 일자는 반드시 'YYYY-MM-DD' 형식으로 입력해주세요.",
@@ -118,24 +125,42 @@ public class RecordInsert extends JFrame {
                 return;
             }
 
-            JOptionPane.showMessageDialog(
-                    RecordInsert.this,
-                    "데이터가 저장되었습니다:\n" +
-                            "회원 ID: " + memberId + "\n" +
-                            "담당 직원 ID: " + staffId + "\n" +
-                            "헌혈 일자: " + year + "-" + month + "-" + day + "\n" +
-                            "헌혈 종류: " + donationType + "\n" +
-                            "헌혈량: " + donationAmount + "ml\n" +
-                            "보관 유효기간: " + storageValidity + "일\n" +
-                            "증정품 종류: " + giftType
-            );
+            // 나머지 입력값 유효성 확인
+            if (memberId.isEmpty() || staffId.isEmpty() || donationAmount.isEmpty() || storageValidity.isEmpty() || giftType.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        RecordInsert.this,
+                        "모든 필드를 입력해주세요.",
+                        "입력 오류",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            try {
+                int amount = Integer.parseInt(donationAmount);
+                int validity = Integer.parseInt(storageValidity);
+
+                // JDBC 호출
+                RecordInsertDatabase dao = new RecordInsertDatabase();
+                boolean success = dao.insertRecord(memberId, staffId, donationDate, donationType, amount, validity, giftType);
+
+                if (success) {
+                    JOptionPane.showMessageDialog(this, "헌혈 기록이 성공적으로 저장되었습니다.");
+                } else {
+                    JOptionPane.showMessageDialog(this, "저장 중 오류가 발생했습니다.", "저장 실패", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(
+                        RecordInsert.this,
+                        "헌혈량과 보관 유효기간은 숫자로 입력해주세요.",
+                        "입력 오류",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
         });
         buttonPanel.add(saveButton);
 
         JButton cancelButton = new JButton("취소");
-        cancelButton.setBackground(buttonColor);
-        cancelButton.setForeground(Color.WHITE);
-        cancelButton.setFont(buttonFont);
         cancelButton.addActionListener(e -> dispose());
         buttonPanel.add(cancelButton);
 
@@ -179,4 +204,7 @@ public class RecordInsert extends JFrame {
         }
     }
 
+    public static void main(String[] args) {
+        new RecordInsert();
+    }
 }
