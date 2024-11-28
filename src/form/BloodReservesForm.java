@@ -115,6 +115,30 @@ public class BloodReservesForm extends JFrame {
     }
 
 
+    // 데이터셋에서 모든 값을 비교하여 전체 최댓값을 계산하는 메서드
+    private double getMaxSumPerBloodType() {
+        double maxSum = 0;
+
+        // 데이터셋의 각 열(column, 즉 혈액형)에 대해 합계를 계산
+        for (Object columnKey : dataset.getColumnKeys()) {
+            double bloodTypeSum = 0;
+
+            // 해당 혈액형에 대해 모든 헌혈 종류의 값을 합산
+            for (Object rowKey : dataset.getRowKeys()) {
+                Number value = dataset.getValue((Comparable<?>) rowKey, (Comparable<?>) columnKey);
+                if (value != null) {
+                    bloodTypeSum += value.doubleValue();
+                }
+            }
+
+            // 합계 중 최대값을 갱신
+            maxSum = Math.max(maxSum, bloodTypeSum);
+        }
+
+        return maxSum;
+    }
+
+
     // 차트 생성 메서드
     private JFreeChart createChart() {
         JFreeChart chart = ChartFactory.createStackedBarChart(
@@ -140,7 +164,9 @@ public class BloodReservesForm extends JFrame {
 
         // Y축 범위 설정
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-        rangeAxis.setRange(0, 10); // Y축 범위를 설정 (조정 가능)
+        double globalMaxDatasetValue = getMaxSumPerBloodType(); // 데이터셋에서 전체 최댓값 계산
+        double adjustedMax = Math.ceil(globalMaxDatasetValue * 1.2); // 최댓값에 20% 추가 (정수로 반올림)
+        rangeAxis.setRange(0, adjustedMax); // Y축 범위 설정
 
         // 스택형 막대 그래프 렌더러 설정
         StackedBarRenderer renderer = new StackedBarRenderer();
