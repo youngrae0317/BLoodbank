@@ -1,5 +1,6 @@
 package form;
 
+import database.*;
 import javax.swing.*;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -15,6 +16,8 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
+import java.util.ArrayList;
 
 public class BloodReservesForm extends JFrame {
     private DefaultCategoryDataset dataset;
@@ -71,22 +74,46 @@ public class BloodReservesForm extends JFrame {
     private void updateDataset(boolean includeWhole, boolean includePlasma, boolean includePlatelet) {
         dataset.clear();
 
-        // 혈액형 배열
-        String[] bloodTypes = {"A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"};
+        // 선택된 헌혈 종류 리스트 생성
+        List<String> bloodTypesToInclude = new ArrayList<>();
+        if (includeWhole) bloodTypesToInclude.add("전혈");
+        if (includePlasma) bloodTypesToInclude.add("성분(혈장)");
+        if (includePlatelet) bloodTypesToInclude.add("성분(혈소판)");
 
-        // 데이터 추가
-        for (String bloodType : bloodTypes) {
-            if (includeWhole) {
-                dataset.addValue((int) (Math.random() * 50) + 10, "전혈", bloodType);
+        // 헌혈종류가 하나라도 선택되지 않았다면 경고 메시지 표시
+        if (bloodTypesToInclude.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "최소 하나의 헌혈종류를 선택해야 합니다.", "오류", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // 데이터베이스에서 데이터 가져오기
+        for (String type : bloodTypesToInclude) {
+            List<Object[]> data = reservesDB.getBloodReserves(type);
+
+            // 데이터셋에 반영
+            for (Object[] row : data) {
+                String bloodType = (String) row[0];
+                String donationType = (String) row[1];
+                int totalAmount = (int) row[2];
+
+                // mL -> L 변환
+                double totalAmountInLiters = totalAmount / 1000.0;
+
+                // 데이터셋에 추가
+                dataset.addValue(totalAmountInLiters, donationType, bloodType);
             }
-            if (includePlasma) {
-                dataset.addValue((int) (Math.random() * 50) + 10, "혈장", bloodType);
-            }
-            if (includePlatelet) {
-                dataset.addValue((int) (Math.random() * 50) + 10, "혈소", bloodType);
+        }
+
+        // 디버깅: 데이터셋 상태 확인
+        System.out.println("Dataset after update:");
+        for (Object rowKey : dataset.getRowKeys()) {
+            for (Object columnKey : dataset.getColumnKeys()) {
+                Number value = dataset.getValue((Comparable<?>) rowKey, (Comparable<?>) columnKey);
+                System.out.println(rowKey + " - " + columnKey + ": " + value + " L");
             }
         }
     }
+
 
     // 차트 생성 메서드
     private JFreeChart createChart() {
@@ -113,13 +140,15 @@ public class BloodReservesForm extends JFrame {
 
         // Y축 범위 설정
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-        rangeAxis.setRange(0, 200); // Y축 범위를 설정 (조정 가능)
+        rangeAxis.setRange(0, 10); // Y축 범위를 설정 (조정 가능)
 
         // 스택형 막대 그래프 렌더러 설정
         StackedBarRenderer renderer = new StackedBarRenderer();
-        renderer.setSeriesPaint(0, Color.BLUE); // 전혈
-        renderer.setSeriesPaint(1, Color.RED); // 혈장
-        renderer.setSeriesPaint(2, Color.GREEN); // 혈소
+
+        // 헌혈 종류별 색상 고정
+        setSeriesColor(renderer, "전혈", Color.RED); // 전혈은 빨간색
+        setSeriesColor(renderer, "성분(혈장)", Color.GREEN); // 혈장은 초록색
+        setSeriesColor(renderer, "성분(혈소판)", Color.BLUE); // 혈소판은 파란색
 
         // 데이터 항목 레이블(막대 위 텍스트) 폰트 설정
         renderer.setBaseItemLabelFont(koreanFont);
@@ -152,6 +181,17 @@ public class BloodReservesForm extends JFrame {
 
         return chart;
     }
+
+    // 행 이름으로 색상을 설정하는 헬퍼 메서드
+    private void setSeriesColor(StackedBarRenderer renderer, String rowKey, Color color) {
+        int rowIndex = dataset.getRowIndex(rowKey);
+        if (rowIndex >= 0) { // 데이터셋에 해당 행이 존재하는 경우에만 색상을 설정
+            renderer.setSeriesPaint(rowIndex, color);
+        }
+    }
+
+
+
 
     public static void main(String[] args) {
         new BloodReservesForm();

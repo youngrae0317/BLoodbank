@@ -9,7 +9,16 @@ import java.sql.SQLException;
 public class RecordeDB {
 
     public static Object[][] fetchBloodRecords() {
-        String query = "SELECT 헌혈기록번호, 회원_ID, 담당직원_ID, 헌혈종류, 헌혈량, 헌혈일자 FROM BLOODBANK.헌혈기록";
+        // JOIN을 사용하여 헌혈자와 직원의 이름과 아이디를 조합
+        String query = "SELECT " +
+                "    헌혈기록번호, " +
+                "    헌혈자.이름 || '(' || 헌혈자.회원_ID || ')' AS 회원정보, " +
+                "    직원.이름 || '(' || 직원.직원_ID || ')' AS 직원정보, " +
+                "    헌혈종류, 헌혈량, 헌혈일자 " +
+                "FROM BLOODBANK.헌혈기록 " +
+                "JOIN BLOODBANK.헌혈자 ON 헌혈기록.회원_ID = 헌혈자.회원_ID " +
+                "JOIN BLOODBANK.직원 ON 헌혈기록.담당직원_ID = 직원.직원_ID";
+
         try (Connection connection = DBConnect.connect();
              PreparedStatement preparedStatement = connection.prepareStatement(query);
              ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -21,8 +30,8 @@ public class RecordeDB {
             while (resultSet.next()) {
                 Object[] row = new Object[6];
                 row[0] = resultSet.getInt("헌혈기록번호");
-                row[1] = resultSet.getString("회원_ID");
-                row[2] = resultSet.getString("담당직원_ID");
+                row[1] = resultSet.getString("회원정보"); // 회원정보: 이름(아이디)
+                row[2] = resultSet.getString("직원정보"); // 직원정보: 이름(아이디)
                 row[3] = resultSet.getString("헌혈종류");
                 row[4] = resultSet.getInt("헌혈량") + "ml";
                 row[5] = resultSet.getDate("헌혈일자").toString();
@@ -37,6 +46,7 @@ public class RecordeDB {
             return new Object[0][0]; // 오류 발생 시 빈 배열 반환
         }
     }
+
 
 
     public static void loadBloodRecords(DefaultTableModel tableModel) {
