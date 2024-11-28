@@ -1,4 +1,3 @@
-
 package form;
 
 import javax.swing.*;
@@ -8,6 +7,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import database.*;
 
 public class BloodRecordsForm extends JFrame {
     private RecordInsert recordInsertForm; // RecordInsert 폼 참조를 저장할 변수
@@ -47,20 +47,17 @@ public class BloodRecordsForm extends JFrame {
 
         // 테이블 데이터
         String[] columnNames = {"기록번호", "ID", "담당직원", "헌혈종류", "헌혈량", "헌혈일자"};
-        Object[][] data = {
-                {"1", "A001", "김철수", "전혈", "350ml", "2024-11-15"},
-                {"2", "A002", "이영희", "혈장", "500ml", "2024-11-10"},
-                {"3", "A003", "박지민", "혈소판", "250ml", "2024-11-08"}
-        };
-
-        // 테이블 모델 생성 시 isCellEditable 오버라이드
-        DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // 모든 셀을 수정 불가능하게 설정
+                return false; // 셀 수정 불가
             }
         };
         JTable table = new JTable(tableModel);
+
+        // 데이터 로드
+        RecordeDB.loadBloodRecords(tableModel);
+
         JScrollPane tableScrollPane = new JScrollPane(table);
         table.setFillsViewportHeight(true);
         centerPanel.add(tableScrollPane, BorderLayout.CENTER);
