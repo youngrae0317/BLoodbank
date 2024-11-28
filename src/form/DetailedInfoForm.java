@@ -1,0 +1,86 @@
+
+package form;
+
+import database.DetailedInfoDatabase;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.HashMap;
+
+public class DetailedInfoForm extends JFrame {
+    public DetailedInfoForm(String memberId) {
+        setTitle("상세 정보");
+        setSize(1010, 700);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setLayout(null);
+
+        // 상단 패널: 제목
+        JPanel titlePanel = new JPanel();
+        titlePanel.setBounds(0, 0, 1000, 60);
+        JLabel titleLabel = new JLabel("상세정보", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("맑은 고딕", Font.BOLD, 24));
+        titlePanel.add(titleLabel);
+        add(titlePanel);
+
+        // 회원 정보 패널
+        JPanel memberInfoPanel = new JPanel(new GridBagLayout());
+        memberInfoPanel.setBorder(BorderFactory.createTitledBorder("회원 정보"));
+        memberInfoPanel.setBounds(10, 70, 980, 200);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+
+        // 회원 정보 필드 추가
+        JTextField memberIdField = addMemberInfoField(memberInfoPanel, gbc, "회원_ID", memberId, 0, 0);
+        JTextField nameField = addMemberInfoField(memberInfoPanel, gbc, "이름", "", 0, 2);
+        JTextField birthField = addMemberInfoField(memberInfoPanel, gbc, "생년월일", "", 1, 0);
+        JTextField phoneField = addMemberInfoField(memberInfoPanel, gbc, "전화번호", "", 1, 2);
+        JTextField genderField = addMemberInfoField(memberInfoPanel, gbc, "성별", "", 2, 0);
+        JTextField bloodTypeField = addMemberInfoField(memberInfoPanel, gbc, "혈액형", "", 2, 2);
+        JTextField addressField = addMemberInfoField(memberInfoPanel, gbc, "주소", "", 3, 0, 3);
+        JTextField donationCountField = addMemberInfoField(memberInfoPanel, gbc, "헌혈횟수", "", 4, 0);
+        JTextField lastDonationDateField = addMemberInfoField(memberInfoPanel, gbc, "마지막 헌혈일", "", 5, 0);
+        JTextField nextDonationDateField = addMemberInfoField(memberInfoPanel, gbc, "헌혈가능일", "", 5, 2);
+
+        add(memberInfoPanel);
+
+        // DB에서 회원 정보 가져오기
+        HashMap<String, Object> donorInfo = DetailedInfoDatabase.getDonorInfo(memberId);
+        if (!donorInfo.isEmpty()) {
+            memberIdField.setText((String) donorInfo.get("회원_ID"));
+            nameField.setText((String) donorInfo.get("이름"));
+            birthField.setText(donorInfo.get("생년월일").toString());
+            phoneField.setText((String) donorInfo.get("휴대폰번호"));
+            genderField.setText((String) donorInfo.get("성별"));
+            bloodTypeField.setText((String) donorInfo.get("혈액형"));
+            addressField.setText((String) donorInfo.get("주소"));
+            donationCountField.setText(String.valueOf(donorInfo.get("헌혈횟수")));
+            lastDonationDateField.setText(donorInfo.get("마지막헌혈일") != null ? donorInfo.get("마지막헌혈일").toString() : "");
+            nextDonationDateField.setText(donorInfo.get("헌혈가능일") != null ? donorInfo.get("헌혈가능일").toString() : "");
+        } else {
+            JOptionPane.showMessageDialog(this, "회원 정보를 찾을 수 없습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private JTextField addMemberInfoField(JPanel panel, GridBagConstraints gbc, String label, String value, int row, int col) {
+        return addMemberInfoField(panel, gbc, label, value, row, col, 1);
+    }
+
+    private JTextField addMemberInfoField(JPanel panel, GridBagConstraints gbc, String label, String value, int row, int col, int gridWidth) {
+        gbc.gridx = col;
+        gbc.gridy = row;
+        gbc.gridwidth = 1;
+        JLabel fieldLabel = new JLabel(label);
+        panel.add(fieldLabel, gbc);
+
+        gbc.gridx = col + 1;
+        gbc.gridwidth = gridWidth;
+        JTextField textField = new JTextField(value);
+        textField.setColumns(20);
+        textField.setEditable(false);
+        panel.add(textField, gbc);
+        return textField;
+    }
+}
