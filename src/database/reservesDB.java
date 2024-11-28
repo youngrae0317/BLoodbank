@@ -58,7 +58,7 @@ public class reservesDB {
 
         return results;
     }
-    public static void main(String[] args) {
+/*    public static void main(String[] args) {
         List<Object[]> data = reservesDB.getBloodReserves("전체");
 
         if (data.isEmpty()) {
@@ -68,5 +68,5 @@ public class reservesDB {
                 System.out.println("혈액형: " + row[0] + ", 헌혈종류: " + row[1] + ", 총 보유량: " + row[2]);
             }
         }
-    }
+    }*/
 }

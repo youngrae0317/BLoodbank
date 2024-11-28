@@ -87,8 +87,9 @@ public class BloodRecordsForm extends JFrame {
                 if (!e.getValueIsAdjusting()) {
                     int selectedRow = table.getSelectedRow();
                     if (selectedRow != -1) {
-                        String selectedId = table.getValueAt(selectedRow, 1).toString(); // ID 열 데이터 가져오기
-                        idField.setText(selectedId); // ID 필드에 설정
+                        String selectedMemberInfo = table.getValueAt(selectedRow, 1).toString(); // 회원정보: 이름(ID)
+                        String extractedId = selectedMemberInfo.substring(selectedMemberInfo.indexOf("(") + 1, selectedMemberInfo.indexOf(")")); // ID만 추출
+                        idField.setText(extractedId); // ID 필드에 설정
                     }
                 }
             }

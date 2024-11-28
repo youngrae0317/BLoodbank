@@ -105,13 +105,13 @@ public class BloodReservesForm extends JFrame {
         }
 
         // 디버깅: 데이터셋 상태 확인
-        System.out.println("Dataset after update:");
+/*        System.out.println("Dataset after update:");
         for (Object rowKey : dataset.getRowKeys()) {
             for (Object columnKey : dataset.getColumnKeys()) {
                 Number value = dataset.getValue((Comparable<?>) rowKey, (Comparable<?>) columnKey);
                 System.out.println(rowKey + " - " + columnKey + ": " + value + " L");
             }
-        }
+        }*/
     }
 
 
