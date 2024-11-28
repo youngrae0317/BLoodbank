@@ -40,7 +40,7 @@ public class BloodReservesForm extends JFrame {
         JPanel filterPanel = new JPanel();
         JCheckBox chkWhole = new JCheckBox("전혈", true);
         JCheckBox chkPlasma = new JCheckBox("혈장", true);
-        JCheckBox chkPlatelet = new JCheckBox("혈소", false);
+        JCheckBox chkPlatelet = new JCheckBox("혈소", true);
         filterPanel.add(chkWhole);
         filterPanel.add(chkPlasma);
         filterPanel.add(chkPlatelet);
