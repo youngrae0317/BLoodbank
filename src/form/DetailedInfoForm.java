@@ -49,6 +49,19 @@ public class DetailedInfoForm extends JFrame {
         // DB에서 회원 정보 가져오기
         populateMemberInfo(memberId, memberIdField, nameField, birthField, phoneField, genderField, bloodTypeField, addressField, donationCountField, lastDonationDateField, nextDonationDateField);
 
+        // 검사 결과 버튼 패널
+        JPanel resultButtonPanel = new JPanel();
+        resultButtonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        resultButtonPanel.setBounds(10, 280, 980, 40);
+        JButton insertResultButton = new JButton("검사 결과 삽입");
+        JButton viewResultButton = new JButton("검사 결과 조회");
+        insertResultButton.setPreferredSize(new Dimension(150, 30));
+        viewResultButton.setPreferredSize(new Dimension(150, 30));
+        resultButtonPanel.add(insertResultButton);
+        resultButtonPanel.add(viewResultButton);
+
+        add(resultButtonPanel);
+
         // 헌혈 기록 테이블
         String[] columnNames = {"기록번호", "ID", "담당직원", "헌혈종류", "헌혈량", "헌혈일자", "헌혈릴레이", "보관유효기간"};
         Object[][] data = DetailedInfoDatabase.getDonationRecords(memberId);
@@ -65,6 +78,26 @@ public class DetailedInfoForm extends JFrame {
         table.setFillsViewportHeight(true);
 
         add(tableScrollPane);
+
+        // 버튼 동작 설정
+        insertResultButton.addActionListener(e -> {
+            String id = memberIdField.getText();
+            TestResultForm.getInstance(id, true); // TestResultForm을 삽입 모드로 호출
+        });
+
+        viewResultButton.addActionListener(e -> {
+            String id = memberIdField.getText();
+            TestResultForm.getInstance(id, false); // TestResultForm을 조회 모드로 호출
+        });
+
+        // 버튼 스타일 지정
+        Color buttonColor = new Color(100, 149, 237);
+        JButton[] buttons = {insertResultButton, viewResultButton};
+        for (JButton button : buttons) {
+            button.setBackground(buttonColor);
+            button.setForeground(Color.WHITE);
+            button.setFont(new Font("맑은 고딕", Font.BOLD, 14));
+        }
 
         setVisible(true);
     }
