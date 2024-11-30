@@ -70,7 +70,7 @@ public class RecordInsert extends JFrame {
         formPanel.add(datePanel);
 
         formPanel.add(new JLabel("헌혈 종류:"));
-        JComboBox<String> donationTypeComboBox = new JComboBox<>(new String[]{"전혈", "혈장", "혈소판"});
+        JComboBox<String> donationTypeComboBox = new JComboBox<>(new String[]{"전혈", "성분(혈장)", "성분(혈소판)"});
         formPanel.add(donationTypeComboBox);
 
         formPanel.add(new JLabel("헌혈량(ml):"));

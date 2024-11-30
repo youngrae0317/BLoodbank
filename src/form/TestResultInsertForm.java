@@ -7,6 +7,14 @@ import java.awt.*;
 
 public class TestResultInsertForm extends JFrame {
     public TestResultInsertForm(int recordId) {
+
+        // 검사 결과 존재 여부 확인
+        if (TestResultDAO.isTestResultExists(recordId)) {
+            JOptionPane.showMessageDialog(null, "해당 헌혈기록에 대한 검사 결과가 이미 존재합니다.", "알림", JOptionPane.INFORMATION_MESSAGE);
+            dispose(); // 폼 닫기
+            return;
+        }
+
         setTitle("검사 결과 삽입");
         setSize(400, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -59,7 +67,7 @@ public class TestResultInsertForm extends JFrame {
             String unexpectedAntibody = ((JComboBox<String>) componentMap.get("비예기항체")).getSelectedItem().toString();
             String bloodSubtype = ((JComboBox<String>) componentMap.get("혈액형아형")).getSelectedItem().toString();
 
-            // 데이터베이스에 삽입하는 로직 추가
+            // 데이터베이스에 삽입하는 로직
             boolean success = TestResultDAO.insertTestResult(recordId, hepatitisB, hepatitisC, syphilis, unexpectedAntibody, bloodSubtype);
 
             if (success) {
