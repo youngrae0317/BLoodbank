@@ -19,6 +19,16 @@ public class ReservationForm extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
+        // 버튼 생성
+        JButton dateSearchButton = new JButton("조회");
+        JButton staffSearchButton = new JButton("조회");
+        JButton registerButton = new JButton("등록");
+
+        // 버튼 스타일 적용
+        styleButton(dateSearchButton);
+        styleButton(staffSearchButton);
+        styleButton(registerButton);
+
         // 상단 패널: 제목
         JPanel titlePanel = new JPanel();
         JLabel titleLabel = new JLabel("예약 조회", SwingConstants.CENTER);
@@ -46,7 +56,6 @@ public class ReservationForm extends JFrame {
         JComboBox<String> monthComboBox = new JComboBox<>(months);
         JComboBox<String> dayComboBox = new JComboBox<>(days);
         JComboBox<String> hourComboBox = new JComboBox<>(hours);
-        JButton dateSearchButton = new JButton("조회");
 
         dateFilterPanel.add(new JLabel("년"));
         dateFilterPanel.add(yearComboBox);
@@ -62,7 +71,6 @@ public class ReservationForm extends JFrame {
         JPanel staffFilterPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         JLabel staffIdLabel = new JLabel("직원 ID");
         JTextField staffIdField = new JTextField(20);
-        JButton staffSearchButton = new JButton("조회");
 
         staffFilterPanel.add(staffIdLabel);
         staffFilterPanel.add(staffIdField);
@@ -86,7 +94,6 @@ public class ReservationForm extends JFrame {
 
         // 하단 패널
         JPanel buttonPanel = new JPanel();
-        JButton registerButton = new JButton("등록");
         buttonPanel.add(registerButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
@@ -118,6 +125,13 @@ public class ReservationForm extends JFrame {
         setVisible(true);
     }
 
+    // 버튼 스타일 적용 메서드
+    private void styleButton(JButton button) {
+        button.setBackground(new Color(100, 149, 237)); // 파란색
+        button.setForeground(Color.WHITE); // 흰색 텍스트
+        button.setFont(new Font("맑은 고딕", Font.BOLD, 14));
+    }
+
     private void fetchReservationData(String year, String month, String day, String hour, String staffId) {
         String startDateTime = null, endDateTime = null;
         if (year != null && month != null && day != null && hour != null) {
@@ -141,6 +155,4 @@ public class ReservationForm extends JFrame {
             tableModel.addRow(row);
         }
     }
-
 }
-

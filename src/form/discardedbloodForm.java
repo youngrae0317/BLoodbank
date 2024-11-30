@@ -30,6 +30,10 @@ public class discardedbloodForm extends JFrame {
         JLabel searchLabel = new JLabel("헌혈기록번호 검색:");
         searchField = new JTextField(15);
         JButton searchButton = new JButton("검색");
+
+        // 버튼 스타일 적용
+        styleButton(searchButton);
+
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -59,6 +63,7 @@ public class discardedbloodForm extends JFrame {
         setVisible(true);
     }
 
+    // 데이터 로드 메서드
     private void loadDiscardedBloodData() {
         discardedbloodDatabase db = new discardedbloodDatabase();
         List<DiscardedBlood> discardedBloodList = db.getAllDiscardedBlood();
@@ -74,6 +79,7 @@ public class discardedbloodForm extends JFrame {
         }
     }
 
+    // 검색 실행 메서드
     private void searchDiscardedBlood() {
         String searchKey = searchField.getText().trim(); // 검색 키워드 가져오기
 
@@ -100,6 +106,13 @@ public class discardedbloodForm extends JFrame {
         if (tableModel.getRowCount() == 0) {
             JOptionPane.showMessageDialog(this, "검색 결과가 없습니다.", "정보", JOptionPane.INFORMATION_MESSAGE);
         }
+    }
+
+    // 버튼 스타일 적용 메서드
+    private void styleButton(JButton button) {
+        button.setBackground(new Color(100, 149, 237)); // 파란색
+        button.setForeground(Color.WHITE); // 흰색 텍스트
+        button.setFont(new Font("맑은 고딕", Font.BOLD, 14));
     }
 
     public static void main(String[] args) {

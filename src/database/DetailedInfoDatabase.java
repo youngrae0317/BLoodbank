@@ -113,7 +113,7 @@ public class DetailedInfoDatabase {
                         resultSet.getString("헌혈일자"),
                         resultSet.getString("헌혈릴레이"),
                         resultSet.getString("보관유효기간"),
-                        resultSet.getString("상태") // 상태 데이터 추가
+                        resultSet.getString("상태")
                 });
             }
         } catch (Exception e) {
