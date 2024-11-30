@@ -2,15 +2,20 @@ package form;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Comparator;
 import database.*;
 
 public class BloodRecordsForm extends JFrame {
     private RecordInsert recordInsertForm; // RecordInsert 폼 참조를 저장할 변수
+    private DefaultTableModel tableModel;
+    private JTable table;
+    private TableRowSorter<DefaultTableModel> sorter;
 
     public BloodRecordsForm() {
         setTitle("헌혈기록");
@@ -47,16 +52,43 @@ public class BloodRecordsForm extends JFrame {
 
         // 테이블 데이터
         String[] columnNames = {"기록번호", "ID", "담당직원", "헌혈종류", "헌혈량", "헌혈일자"};
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
+        tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false; // 셀 수정 불가
             }
         };
-        JTable table = new JTable(tableModel);
+        table = new JTable(tableModel);
 
-        // 데이터 로드
-        RecordeDB.loadBloodRecords(tableModel);
+        // 데이터 로드 (기본 정렬: 기록번호 오름차순)
+        RecordeDB.loadBloodRecords(tableModel, "헌혈기록번호", "ASC");
+
+        // 테이블에 RowSorter 설정 (동적 정렬 지원)
+        sorter = new TableRowSorter<>(tableModel);
+        table.setRowSorter(sorter);
+
+        // 숫자형 및 날짜형 열의 Comparator 설정
+        sorter.setComparator(0, new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return o1.compareTo(o2);
+            }
+        });
+        sorter.setComparator(4, new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                // "ml" 제거 후 숫자 비교
+                Integer val1 = Integer.parseInt(o1.replace("ml", ""));
+                Integer val2 = Integer.parseInt(o2.replace("ml", ""));
+                return val1.compareTo(val2);
+            }
+        });
+        sorter.setComparator(5, new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.compareTo(o2); // 날짜 문자열 비교 (yyyy-MM-dd 형식이므로 가능)
+            }
+        });
 
         JScrollPane tableScrollPane = new JScrollPane(table);
         table.setFillsViewportHeight(true);
@@ -87,7 +119,8 @@ public class BloodRecordsForm extends JFrame {
                 if (!e.getValueIsAdjusting()) {
                     int selectedRow = table.getSelectedRow();
                     if (selectedRow != -1) {
-                        String selectedMemberInfo = table.getValueAt(selectedRow, 1).toString(); // 회원정보: 이름(ID)
+                        int modelRow = table.convertRowIndexToModel(selectedRow); // 정렬된 뷰 인덱스를 모델 인덱스로 변환
+                        String selectedMemberInfo = tableModel.getValueAt(modelRow, 1).toString(); // 회원정보: 이름(ID)
                         String extractedId = selectedMemberInfo.substring(selectedMemberInfo.indexOf("(") + 1, selectedMemberInfo.indexOf(")")); // ID만 추출
                         idField.setText(extractedId); // ID 필드에 설정
                     }

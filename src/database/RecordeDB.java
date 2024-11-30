@@ -5,10 +5,29 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
 
 public class RecordeDB {
 
-    public static Object[][] fetchBloodRecords() {
+    public static Object[][] fetchBloodRecords(String sortColumn, String sortOrder) {
+        // 유효한 컬럼인지 확인
+        String[] validColumns = {"헌혈기록번호", "회원정보", "직원정보", "헌혈종류", "헌혈량", "헌혈일자"};
+        boolean isValidColumn = false;
+        for (String col : validColumns) {
+            if (col.equals(sortColumn)) {
+                isValidColumn = true;
+                break;
+            }
+        }
+        if (!isValidColumn) {
+            sortColumn = "헌혈기록번호"; // 기본 정렬 컬럼
+        }
+
+        // 정렬 방식이 ASC 또는 DESC인지 확인
+        if (!sortOrder.equalsIgnoreCase("ASC") && !sortOrder.equalsIgnoreCase("DESC")) {
+            sortOrder = "ASC"; // 기본 정렬 방식
+        }
+
         // JOIN을 사용하여 헌혈자와 직원의 이름과 아이디를 조합
         String query = "SELECT " +
                 "    헌혈기록번호, " +
@@ -17,7 +36,8 @@ public class RecordeDB {
                 "    헌혈종류, 헌혈량, 헌혈일자 " +
                 "FROM BLOODBANK.헌혈기록 " +
                 "JOIN BLOODBANK.헌혈자 ON 헌혈기록.회원_ID = 헌혈자.회원_ID " +
-                "JOIN BLOODBANK.직원 ON 헌혈기록.담당직원_ID = 직원.직원_ID";
+                "JOIN BLOODBANK.직원 ON 헌혈기록.담당직원_ID = 직원.직원_ID " +
+                "ORDER BY " + sortColumn + " " + sortOrder;
 
         try (Connection connection = DBConnect.connect();
              PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -33,8 +53,8 @@ public class RecordeDB {
                 row[1] = resultSet.getString("회원정보"); // 회원정보: 이름(아이디)
                 row[2] = resultSet.getString("직원정보"); // 직원정보: 이름(아이디)
                 row[3] = resultSet.getString("헌혈종류");
-                row[4] = resultSet.getInt("헌혈량") + "ml";
-                row[5] = resultSet.getDate("헌혈일자").toString();
+                row[4] = resultSet.getInt("헌혈량");      // Integer 타입으로 저장
+                row[5] = resultSet.getDate("헌혈일자");   // Date 타입으로 저장
                 dataList.add(row);
             }
 
@@ -47,13 +67,20 @@ public class RecordeDB {
         }
     }
 
-
-
-    public static void loadBloodRecords(DefaultTableModel tableModel) {
-        Object[][] data = fetchBloodRecords();
+    public static void loadBloodRecords(DefaultTableModel tableModel, String sortColumn, String sortOrder) {
+        Object[][] data = fetchBloodRecords(sortColumn, sortOrder);
         tableModel.setRowCount(0); // 기존 데이터 삭제
         for (Object[] row : data) {
-            tableModel.addRow(row); // 새 데이터 추가
+            // 헌혈량에 "ml" 추가, 헌혈일자는 문자열로 변환
+            Object[] displayRow = new Object[] {
+                    row[0], // 헌혈기록번호
+                    row[1], // 회원정보
+                    row[2], // 직원정보
+                    row[3], // 헌혈종류
+                    row[4] + "ml", // 헌혈량에 "ml" 추가
+                    row[5].toString() // 헌혈일자
+            };
+            tableModel.addRow(displayRow);
         }
     }
 }
