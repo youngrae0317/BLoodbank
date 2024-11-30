@@ -8,6 +8,8 @@ import java.awt.*;
 import java.util.HashMap;
 
 public class DetailedInfoForm extends JFrame {
+    private int selectedRecordId = -1; // 선택된 헌혈기록번호를 저장할 변수
+
     public DetailedInfoForm(String memberId) {
         setTitle("상세 정보");
         setSize(1010, 700);
@@ -63,7 +65,6 @@ public class DetailedInfoForm extends JFrame {
         add(resultButtonPanel);
 
         // 헌혈 기록 테이블
-        // 헌혈 기록 테이블
         String[] columnNames = {"기록번호", "ID", "담당직원", "헌혈종류", "헌혈량", "헌혈일자", "헌혈릴레이", "보관유효기간", "검사상태"}; // "검사상태" 추가
         Object[][] data = DetailedInfoDatabase.getDonationRecords(memberId);
 
@@ -80,16 +81,32 @@ public class DetailedInfoForm extends JFrame {
 
         add(tableScrollPane);
 
+        // 테이블 선택 이벤트 리스너 추가
+        table.getSelectionModel().addListSelectionListener(event -> {
+            if (!event.getValueIsAdjusting()) {
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow != -1) {
+                    int modelRow = table.convertRowIndexToModel(selectedRow);
+                    selectedRecordId = (int) tableModel.getValueAt(modelRow, 0); // 0번째 열이 헌혈기록번호
+                }
+            }
+        });
 
         // 버튼 동작 설정
         insertResultButton.addActionListener(e -> {
-            String id = memberIdField.getText();
-            TestResultForm.getInstance(id, true); // TestResultForm을 삽입 모드로 호출
+            if (selectedRecordId != -1) {
+                new TestResultInsertForm(selectedRecordId); // 선택된 헌혈기록번호로 삽입 폼 생성
+            } else {
+                JOptionPane.showMessageDialog(this, "헌혈 기록을 선택해주세요.", "알림", JOptionPane.INFORMATION_MESSAGE);
+            }
         });
 
         viewResultButton.addActionListener(e -> {
-            String id = memberIdField.getText();
-            TestResultForm.getInstance(id, false); // TestResultForm을 조회 모드로 호출
+            if (selectedRecordId != -1) {
+                new TestResultViewForm(selectedRecordId); // 선택된 헌혈기록번호로 조회 폼 생성
+            } else {
+                JOptionPane.showMessageDialog(this, "헌혈 기록을 선택해주세요.", "알림", JOptionPane.INFORMATION_MESSAGE);
+            }
         });
 
         // 버튼 스타일 지정
