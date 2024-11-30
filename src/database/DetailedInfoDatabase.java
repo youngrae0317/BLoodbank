@@ -88,9 +88,11 @@ public class DetailedInfoDatabase {
             connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
 
             // SQL 쿼리
-            String query = "SELECT 헌혈기록번호, 회원_ID, 담당직원_ID, 헌혈종류, 헌혈량, TO_CHAR(헌혈일자, 'YYYY-MM-DD') AS 헌혈일자, " +
+            String query = "SELECT 헌혈기록번호, 회원_ID, 담당직원_ID, 헌혈종류, 헌혈량, " +
+                    "TO_CHAR(헌혈일자, 'YYYY-MM-DD') AS 헌혈일자, " +
                     "TO_CHAR(보관유효기간, 'YYYY-MM-DD') AS 보관유효기간, " +
-                    "CASE WHEN 헌혈릴레이_ID IS NOT NULL THEN '참여' ELSE '미참여' END AS 헌혈릴레이 " +
+                    "CASE WHEN 헌혈릴레이_ID IS NOT NULL THEN '참여' ELSE '미참여' END AS 헌혈릴레이, " +
+                    "상태 " + // 상태 컬럼 추가
                     "FROM BLOODBANK.헌혈기록 WHERE 회원_ID = ?";
 
             // PreparedStatement 생성
@@ -110,7 +112,8 @@ public class DetailedInfoDatabase {
                         resultSet.getString("헌혈량") + "ml",
                         resultSet.getString("헌혈일자"),
                         resultSet.getString("헌혈릴레이"),
-                        resultSet.getString("보관유효기간")
+                        resultSet.getString("보관유효기간"),
+                        resultSet.getString("상태") // 상태 데이터 추가
                 });
             }
         } catch (Exception e) {
@@ -129,4 +132,5 @@ public class DetailedInfoDatabase {
         // 결과를 2차원 배열로 변환
         return records.toArray(new Object[0][0]);
     }
+
 }

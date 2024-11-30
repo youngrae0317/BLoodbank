@@ -63,13 +63,14 @@ public class DetailedInfoForm extends JFrame {
         add(resultButtonPanel);
 
         // 헌혈 기록 테이블
-        String[] columnNames = {"기록번호", "ID", "담당직원", "헌혈종류", "헌혈량", "헌혈일자", "헌혈릴레이", "보관유효기간"};
+        // 헌혈 기록 테이블
+        String[] columnNames = {"기록번호", "ID", "담당직원", "헌혈종류", "헌혈량", "헌혈일자", "헌혈릴레이", "보관유효기간", "검사상태"}; // "검사상태" 추가
         Object[][] data = DetailedInfoDatabase.getDonationRecords(memberId);
 
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false;
+                return false; // 테이블 셀 수정 비활성화
             }
         };
         JTable table = new JTable(tableModel);
@@ -78,6 +79,7 @@ public class DetailedInfoForm extends JFrame {
         table.setFillsViewportHeight(true);
 
         add(tableScrollPane);
+
 
         // 버튼 동작 설정
         insertResultButton.addActionListener(e -> {

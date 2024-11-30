@@ -18,6 +18,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.ArrayList;
+import org.jfree.chart.labels.ItemLabelPosition;
+import org.jfree.chart.labels.ItemLabelAnchor;
+import org.jfree.ui.TextAnchor;
 
 public class BloodReservesForm extends JFrame {
     private DefaultCategoryDataset dataset;
@@ -74,44 +77,46 @@ public class BloodReservesForm extends JFrame {
     private void updateDataset(boolean includeWhole, boolean includePlasma, boolean includePlatelet) {
         dataset.clear();
 
-        // 선택된 헌혈 종류 리스트 생성
         List<String> bloodTypesToInclude = new ArrayList<>();
         if (includeWhole) bloodTypesToInclude.add("전혈");
         if (includePlasma) bloodTypesToInclude.add("성분(혈장)");
         if (includePlatelet) bloodTypesToInclude.add("성분(혈소판)");
 
-        // 헌혈종류가 하나라도 선택되지 않았다면 경고 메시지 표시
         if (bloodTypesToInclude.isEmpty()) {
             JOptionPane.showMessageDialog(this, "최소 하나의 헌혈종류를 선택해야 합니다.", "오류", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // 데이터베이스에서 데이터 가져오기
         for (String type : bloodTypesToInclude) {
+            System.out.println("Fetching data for: " + type); // 디버깅 출력
             List<Object[]> data = reservesDB.getBloodReserves(type);
 
-            // 데이터셋에 반영
             for (Object[] row : data) {
                 String bloodType = (String) row[0];
                 String donationType = (String) row[1];
                 int totalAmount = (int) row[2];
 
-                // mL -> L 변환
-                double totalAmountInLiters = totalAmount / 1000.0;
+                // 데이터 확인 출력
+                System.out.println("BloodType: " + bloodType + ", DonationType: " + donationType + ", TotalAmount: " + totalAmount);
 
-                // 데이터셋에 추가
+                // 문자열 표준화
+                if (donationType.equals("혈소판") || donationType.equals("성분(혈소)")) {
+                    donationType = "성분(혈소판)";
+                }
+
+                double totalAmountInLiters = totalAmount / 1000.0;
                 dataset.addValue(totalAmountInLiters, donationType, bloodType);
             }
         }
 
-        // 디버깅: 데이터셋 상태 확인
-/*        System.out.println("Dataset after update:");
+        // 디버깅: 데이터셋 값 출력
+        System.out.println("Dataset values:");
         for (Object rowKey : dataset.getRowKeys()) {
             for (Object columnKey : dataset.getColumnKeys()) {
                 Number value = dataset.getValue((Comparable<?>) rowKey, (Comparable<?>) columnKey);
-                System.out.println(rowKey + " - " + columnKey + ": " + value + " L");
+                System.out.println(rowKey + " - " + columnKey + ": " + (value != null ? value : "null") + " L");
             }
-        }*/
+        }
     }
 
 
@@ -157,31 +162,48 @@ public class BloodReservesForm extends JFrame {
         CategoryPlot plot = (CategoryPlot) chart.getPlot();
 
         // X축 및 Y축 폰트 설정
-        plot.getDomainAxis().setLabelFont(koreanFont); // X축 레이블 폰트
-        plot.getDomainAxis().setTickLabelFont(koreanFont); // X축 값 폰트
-        plot.getRangeAxis().setLabelFont(koreanFont); // Y축 레이블 폰트
-        plot.getRangeAxis().setTickLabelFont(koreanFont); // Y축 값 폰트
+        plot.getDomainAxis().setLabelFont(koreanFont);
+        plot.getDomainAxis().setTickLabelFont(koreanFont);
+        plot.getRangeAxis().setLabelFont(koreanFont);
+        plot.getRangeAxis().setTickLabelFont(koreanFont);
 
         // Y축 범위 설정
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
         double globalMaxDatasetValue = getMaxSumPerBloodType(); // 데이터셋에서 전체 최댓값 계산
-        double adjustedMax = Math.ceil(globalMaxDatasetValue * 1.2); // 최댓값에 20% 추가 (정수로 반올림)
-        rangeAxis.setRange(0, adjustedMax); // Y축 범위 설정
+        double adjustedMax = Math.ceil(globalMaxDatasetValue * 1.2); // 최댓값에 20% 추가
+        rangeAxis.setAutoRangeIncludesZero(true);
+        rangeAxis.setRange(0, adjustedMax);
 
         // 스택형 막대 그래프 렌더러 설정
         StackedBarRenderer renderer = new StackedBarRenderer();
 
         // 헌혈 종류별 색상 고정
-        setSeriesColor(renderer, "전혈", Color.RED); // 전혈은 빨간색
-        setSeriesColor(renderer, "성분(혈장)", Color.GREEN); // 혈장은 초록색
-        setSeriesColor(renderer, "성분(혈소판)", Color.BLUE); // 혈소판은 파란색
+        setSeriesColor(renderer, "전혈", Color.RED);
+        setSeriesColor(renderer, "성분(혈장)", Color.GREEN);
+        setSeriesColor(renderer, "성분(혈소판)", Color.YELLOW);
 
-        // 데이터 항목 레이블(막대 위 텍스트) 폰트 설정
-        renderer.setBaseItemLabelFont(koreanFont);
-        renderer.setBaseItemLabelsVisible(true); // 데이터 레이블 표시
+        // 최소 막대 크기 설정
+        renderer.setMinimumBarLength(0.1);
 
-        // 데이터 항목 레이블 생성기 (익명 클래스 사용)
+        // 항목 레이블 폰트 설정
+        renderer.setBaseItemLabelFont(new Font("맑은 고딕", Font.PLAIN, 16));
+
+        // 각 시리즈의 레이블을 명시적으로 활성화하고 위치를 설정
+        for (int i = 0; i < dataset.getRowCount(); i++) {
+            renderer.setSeriesItemLabelsVisible(i, true);
+            renderer.setSeriesPositiveItemLabelPosition(i, new ItemLabelPosition(
+                    ItemLabelAnchor.CENTER, TextAnchor.CENTER));
+        }
+
+        // 데이터 항목 레이블 생성기 설정
         renderer.setBaseItemLabelGenerator(new CategoryItemLabelGenerator() {
+            @Override
+            public String generateLabel(CategoryDataset dataset, int row, int column) {
+                Number value = dataset.getValue(row, column);
+                String valueText = (value != null) ? String.format("%.1f L", value.doubleValue()) : "0 L";
+                return valueText;
+            }
+
             @Override
             public String generateRowLabel(CategoryDataset dataset, int row) {
                 return dataset.getRowKey(row).toString();
@@ -191,22 +213,21 @@ public class BloodReservesForm extends JFrame {
             public String generateColumnLabel(CategoryDataset dataset, int column) {
                 return dataset.getColumnKey(column).toString();
             }
-
-            @Override
-            public String generateLabel(CategoryDataset dataset, int row, int column) {
-                return dataset.getRowKey(row) + " (" + dataset.getValue(row, column) + ")";
-            }
         });
 
+        renderer.setBaseItemLabelsVisible(true);
         plot.setRenderer(renderer);
 
-        // 범례(legend) 폰트 설정
+        // 범례 폰트 설정
         if (chart.getLegend() != null) {
-            chart.getLegend().setItemFont(koreanFont); // 범례 폰트 설정
+            chart.getLegend().setItemFont(koreanFont);
         }
 
         return chart;
     }
+
+
+
 
     // 행 이름으로 색상을 설정하는 헬퍼 메서드
     private void setSeriesColor(StackedBarRenderer renderer, String rowKey, Color color) {
