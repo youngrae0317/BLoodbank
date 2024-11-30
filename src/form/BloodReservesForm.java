@@ -110,13 +110,13 @@ public class BloodReservesForm extends JFrame {
         }
 
         // 디버깅: 데이터셋 값 출력
-        System.out.println("Dataset values:");
-        for (Object rowKey : dataset.getRowKeys()) {
+/*        System.out.println("Dataset values:");
+          for (Object rowKey : dataset.getRowKeys()) {
             for (Object columnKey : dataset.getColumnKeys()) {
                 Number value = dataset.getValue((Comparable<?>) rowKey, (Comparable<?>) columnKey);
                 System.out.println(rowKey + " - " + columnKey + ": " + (value != null ? value : "null") + " L");
             }
-        }
+        }*/
     }
 
 
@@ -144,6 +144,7 @@ public class BloodReservesForm extends JFrame {
     }
 
 
+    // 차트 생성 메서드
     // 차트 생성 메서드
     private JFreeChart createChart() {
         JFreeChart chart = ChartFactory.createStackedBarChart(
@@ -186,7 +187,7 @@ public class BloodReservesForm extends JFrame {
         renderer.setMinimumBarLength(0.1);
 
         // 항목 레이블 폰트 설정
-        renderer.setBaseItemLabelFont(new Font("맑은 고딕", Font.PLAIN, 16));
+        renderer.setBaseItemLabelFont(new Font("맑은 고딕", Font.PLAIN, 10));
 
         // 각 시리즈의 레이블을 명시적으로 활성화하고 위치를 설정
         for (int i = 0; i < dataset.getRowCount(); i++) {
