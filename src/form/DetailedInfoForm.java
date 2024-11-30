@@ -1,11 +1,20 @@
 package form;
 
 import database.DetailedInfoDatabase;
+import database.TestResultDAO;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.HashMap;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.SortOrder;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DetailedInfoForm extends JFrame {
     private int selectedRecordId = -1; // 선택된 헌혈기록번호를 저장할 변수
@@ -65,7 +74,7 @@ public class DetailedInfoForm extends JFrame {
         add(resultButtonPanel);
 
         // 헌혈 기록 테이블
-        String[] columnNames = {"기록번호", "ID", "담당직원", "헌혈종류", "헌혈량", "헌혈일자", "헌혈릴레이", "보관유효기간", "검사상태"}; // "검사상태" 추가
+        String[] columnNames = {"기록번호", "ID", "담당직원", "헌혈종류", "헌혈량", "헌혈일자", "헌혈릴레이", "보관유효기간", "검사상태"};
         Object[][] data = DetailedInfoDatabase.getDonationRecords(memberId);
 
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
@@ -75,6 +84,23 @@ public class DetailedInfoForm extends JFrame {
             }
         };
         JTable table = new JTable(tableModel);
+
+        // 테이블에 RowSorter 설정 (동적 정렬 지원)
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(tableModel);
+        table.setRowSorter(sorter);
+
+        // Comparator 설정
+        sorter.setComparator(0, Comparator.comparingInt(o -> Integer.parseInt(o.toString()))); // 기록번호
+        sorter.setComparator(4, Comparator.comparingInt(o -> Integer.parseInt(o.toString().replace("ml", "").trim()))); // 헌혈량
+        sorter.setComparator(5, Comparator.comparing(o -> LocalDate.parse(o.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd")))); // 헌혈일자
+        sorter.setComparator(7, Comparator.comparingInt(o -> Integer.parseInt(o.toString().replace("일", "").trim()))); // 보관유효기간
+
+        // 초기 정렬 키 설정 (기록번호 열을 내림차순으로 정렬)
+        List<RowSorter.SortKey> sortKeys = new ArrayList<>();
+        sortKeys.add(new RowSorter.SortKey(0, SortOrder.DESCENDING)); // 0번 열(기록번호)을 내림차순으로 정렬
+        sorter.setSortKeys(sortKeys);
+        sorter.sort(); // 정렬 적용
+
         JScrollPane tableScrollPane = new JScrollPane(table);
         tableScrollPane.setBounds(10, 330, 980, 300);
         table.setFillsViewportHeight(true);
@@ -95,7 +121,11 @@ public class DetailedInfoForm extends JFrame {
         // 버튼 동작 설정
         insertResultButton.addActionListener(e -> {
             if (selectedRecordId != -1) {
-                new TestResultInsertForm(selectedRecordId); // 선택된 헌혈기록번호로 삽입 폼 생성
+                if (TestResultDAO.isTestResultExists(selectedRecordId)) {
+                    JOptionPane.showMessageDialog(this, "해당 헌혈기록에 대한 검사 결과가 이미 존재합니다.", "알림", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    new TestResultInsertForm(selectedRecordId); // 삽입 폼 생성
+                }
             } else {
                 JOptionPane.showMessageDialog(this, "헌혈 기록을 선택해주세요.", "알림", JOptionPane.INFORMATION_MESSAGE);
             }
