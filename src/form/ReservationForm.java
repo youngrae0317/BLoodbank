@@ -20,9 +20,9 @@ public class ReservationForm extends JFrame {
         setLayout(new BorderLayout());
 
         // 버튼 생성
-        JButton dateSearchButton = new JButton("조회");
-        JButton staffSearchButton = new JButton("조회");
-        JButton registerButton = new JButton("등록");
+        JButton dateSearchButton = new JButton("날짜로 조회");
+        JButton staffSearchButton = new JButton("직원 ID로 조회");
+        JButton registerButton = new JButton("예약 등록");
 
         // 버튼 스타일 적용
         styleButton(dateSearchButton);
@@ -50,7 +50,7 @@ public class ReservationForm extends JFrame {
         String[] years = { "2015", "2016", "2017", "2023", "2024", "2025" };
         String[] months = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" };
         String[] days = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" };
-        String[] hours = {"전체시간", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00" };
+        String[] hours = {"전체시간", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"};
 
         JComboBox<String> yearComboBox = new JComboBox<>(years);
         JComboBox<String> monthComboBox = new JComboBox<>(months);
@@ -122,16 +122,32 @@ public class ReservationForm extends JFrame {
             }
         });
 
+        // 등록 버튼 이벤트 핸들러 추가
+        registerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new ReservationRegistrationForm();
+            }
+        });
+
         setVisible(true);
     }
 
     // 버튼 스타일 적용 메서드
     private void styleButton(JButton button) {
-        button.setBackground(new Color(100, 149, 237)); // 파란색
+        button.setBackground(new Color(60, 179, 113)); // 초록색
         button.setForeground(Color.WHITE); // 흰색 텍스트
         button.setFont(new Font("맑은 고딕", Font.BOLD, 14));
     }
 
+    /**
+     * 예약 데이터 조회 메서드
+     * @param year 년도
+     * @param month 월
+     * @param day 일
+     * @param hour 시간
+     * @param staffId 직원 ID
+     */
     private void fetchReservationData(String year, String month, String day, String hour, String staffId) {
         String startDateTime = null, endDateTime = null;
         if (year != null && month != null && day != null && hour != null) {
@@ -141,9 +157,9 @@ public class ReservationForm extends JFrame {
                 endDateTime = String.format("%04d-%02d-%02d 23:59:59",
                         Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day));
             } else {
-                startDateTime = String.format("%04d-%02d-%02d %s:00",
+                startDateTime = String.format("%04d-%02d-%02d %s:00:00",
                         Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day), hour.substring(0, 2));
-                endDateTime = String.format("%04d-%02d-%02d %s:59",
+                endDateTime = String.format("%04d-%02d-%02d %s:59:59",
                         Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day), hour.substring(0, 2));
             }
         }
