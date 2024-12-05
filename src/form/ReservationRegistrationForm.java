@@ -24,7 +24,7 @@ public class ReservationRegistrationForm extends JFrame {
 
     public ReservationRegistrationForm() {
         setTitle("예약 등록");
-        setSize(450, 350); // 폼 크기 약간 확대
+        setSize(500, 350); // 폼 크기 약간 확대
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new GridBagLayout());
