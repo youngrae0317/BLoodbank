@@ -24,13 +24,13 @@ public class ReservationRegistrationForm extends JFrame {
 
     public ReservationRegistrationForm() {
         setTitle("예약 등록");
-        setSize(500, 350); // 폼 크기 약간 확대
+        setSize(600, 400); // 폼 크기 확장
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10,10,10,10);
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // 회원 ID
@@ -39,33 +39,42 @@ public class ReservationRegistrationForm extends JFrame {
         add(new JLabel("회원 ID:"), gbc);
 
         memberIdField = new JTextField();
+        memberIdField.setPreferredSize(new Dimension(200, 25)); // 텍스트박스 크기 조정
         gbc.gridx = 1;
         gbc.gridy = 0;
+        gbc.gridwidth = 2;
         add(memberIdField, gbc);
 
         // 예약 이름
         gbc.gridx = 0;
         gbc.gridy = 1;
+        gbc.gridwidth = 1;
         add(new JLabel("예약 이름:"), gbc);
 
         reservationNameField = new JTextField();
+        reservationNameField.setPreferredSize(new Dimension(200, 25)); // 텍스트박스 크기 조정
         gbc.gridx = 1;
         gbc.gridy = 1;
+        gbc.gridwidth = 2;
         add(reservationNameField, gbc);
 
-        // 담당 직원 ID
+        // 담당 직원 ID -> 담당 직원으로 수정
         gbc.gridx = 0;
         gbc.gridy = 2;
-        add(new JLabel("담당 직원 ID:"), gbc);
+        gbc.gridwidth = 1;
+        add(new JLabel("담당 직원:"), gbc); // 수정된 레이블
 
         staffIdField = new JTextField();
+        staffIdField.setPreferredSize(new Dimension(200, 25)); // 텍스트박스 크기 조정
         gbc.gridx = 1;
         gbc.gridy = 2;
+        gbc.gridwidth = 2;
         add(staffIdField, gbc);
 
         // 예약 일시
         gbc.gridx = 0;
         gbc.gridy = 3;
+        gbc.gridwidth = 1;
         add(new JLabel("예약 일시:"), gbc);
 
         JPanel dateTimePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
@@ -74,17 +83,17 @@ public class ReservationRegistrationForm extends JFrame {
         yearComboBox = new JComboBox<>(years);
 
         String[] months = new String[12];
-        for(int i=1; i<=12; i++) months[i-1] = String.valueOf(i);
+        for (int i = 1; i <= 12; i++) months[i - 1] = String.valueOf(i);
         monthComboBox = new JComboBox<>(months);
 
         String[] days = new String[31];
-        for(int i=1; i<=31; i++) days[i-1] = String.valueOf(i);
+        for (int i = 1; i <= 31; i++) days[i - 1] = String.valueOf(i);
         dayComboBox = new JComboBox<>(days);
 
-        String[] hours = {"08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18"};
+        String[] hours = { "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18" };
         hourComboBox = new JComboBox<>(hours);
 
-        String[] minutes = {"00", "10", "20", "30", "40", "50"}; // 10분 단위로 수정
+        String[] minutes = { "00", "10", "20", "30", "40", "50" };
         minuteComboBox = new JComboBox<>(minutes); // 예약 시간은 10분 단위로 제한
 
         dateTimePanel.add(new JLabel("년"));
@@ -97,16 +106,18 @@ public class ReservationRegistrationForm extends JFrame {
         dateTimePanel.add(hourComboBox);
         dateTimePanel.add(new JLabel("시"));
         dateTimePanel.add(new JLabel("분"));
-        dateTimePanel.add(minuteComboBox); // 분 콤보박스 추가
+        dateTimePanel.add(minuteComboBox);
 
         gbc.gridx = 1;
         gbc.gridy = 3;
+        gbc.gridwidth = 2; // 날짜/시간 필드를 더 넓게 확장
         add(dateTimePanel, gbc);
 
         // 등록 버튼
         registerButton = new JButton("등록");
         gbc.gridx = 1;
         gbc.gridy = 4;
+        gbc.gridwidth = 2;
         add(registerButton, gbc);
 
         // 버튼 스타일 적용
@@ -127,7 +138,7 @@ public class ReservationRegistrationForm extends JFrame {
                 String minute = (String) minuteComboBox.getSelectedItem();
 
                 // 유효성 검사
-                if(memberId.isEmpty() || reservationName.isEmpty() || staffId.isEmpty()) {
+                if (memberId.isEmpty() || reservationName.isEmpty() || staffId.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "모든 필드를 입력해주세요.", "경고", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
@@ -157,12 +168,12 @@ public class ReservationRegistrationForm extends JFrame {
                     ReservationInsertDatabase.insertReservation(memberId, reservationTimestamp, reservationName, staffId);
                     JOptionPane.showMessageDialog(null, "예약이 성공적으로 등록되었습니다.", "성공", JOptionPane.INFORMATION_MESSAGE);
                     dispose(); // 폼 닫기
-                } catch (SQLException ex) { // SQLException을 인식할 수 있도록 함
-                    // Oracle 오류 코드에 따른 메시지 처리
+                } catch (SQLException ex) {
+                    // 오류 처리
                     String errorMessage = ex.getMessage();
-                    if (ex.getErrorCode() == 20001) { // 해당 회원은 이미 오늘 예약이 존재합니다.
+                    if (ex.getErrorCode() == 20001) { // 해당 회원...
                         JOptionPane.showMessageDialog(null, "해당 회원은 이미 오늘 예약이 존재합니다.", "예약 오류", JOptionPane.ERROR_MESSAGE);
-                    } else if (ex.getErrorCode() == 20002) { // 해당 시간대의 예약 인원이 이미 6명을 초과했습니다.
+                    } else if (ex.getErrorCode() == 20002) { // 예약 초과
                         JOptionPane.showMessageDialog(null, "해당 시간대의 예약 인원이 이미 6명을 초과했습니다.", "예약 오류", JOptionPane.ERROR_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(null, "예약 등록에 실패했습니다.\n오류: " + errorMessage, "오류", JOptionPane.ERROR_MESSAGE);
@@ -184,3 +195,4 @@ public class ReservationRegistrationForm extends JFrame {
         button.setFont(new Font("맑은 고딕", Font.BOLD, 14));
     }
 }
+

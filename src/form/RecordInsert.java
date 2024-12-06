@@ -12,7 +12,7 @@ import java.awt.event.KeyEvent;
 public class RecordInsert extends JFrame {
     public RecordInsert() {
         setTitle("헌혈 기록 삽입");
-        setSize(400, 500);
+        setSize(600, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
@@ -176,18 +176,18 @@ public class RecordInsert extends JFrame {
         return Integer.MAX_VALUE; // 기본값
     }
 
-    // 힌트 텍스트 필드 클래스
     private static class HintTextField extends JTextField {
         private final String hint;
 
         public HintTextField(String hint) {
             this.hint = hint;
+            setForeground(Color.GRAY); // 힌트 텍스트의 색상을 기본적으로 회색으로 설정
             addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusGained(FocusEvent e) {
                     if (getText().equals(hint)) {
                         setText("");
-                        setForeground(Color.BLACK);
+                        setForeground(Color.BLACK); // 포커스를 받으면 텍스트를 지우고 색상을 검정으로 변경
                     }
                 }
 
@@ -195,14 +195,14 @@ public class RecordInsert extends JFrame {
                 public void focusLost(FocusEvent e) {
                     if (getText().isEmpty()) {
                         setText(hint);
-                        setForeground(Color.GRAY);
+                        setForeground(Color.GRAY); // 텍스트가 비면 힌트 텍스트를 회색으로 설정
                     }
                 }
             });
-            setText(hint);
-            setForeground(Color.GRAY);
+            setText(hint); // 처음에 힌트 텍스트를 표시
         }
     }
+
 
     public static void main(String[] args) {
         new RecordInsert();

@@ -7,18 +7,10 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library" exported="">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/jar/jcommon-1.0.8.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
     <orderEntry type="library" exported="" name="jfreechart-1.0.19-demo" level="project" />
     <orderEntry type="library" exported="" name="experimental" level="project" />
     <orderEntry type="library" exported="" name="ojdbc8" level="project" />
     <orderEntry type="library" exported="" name="jfreechart-1.0.19-demo1" level="project" />
+    <orderEntry type="library" exported="" name="flatlaf-3.5.2" level="project" />
   </component>
 </module>
