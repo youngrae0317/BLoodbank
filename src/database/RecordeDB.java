@@ -83,4 +83,22 @@ public class RecordeDB {
             tableModel.addRow(displayRow);
         }
     }
+
+    // 회원 ID 존재 여부 확인 메서드
+    public static boolean checkMemberExists(String memberId) {
+        String query = "SELECT COUNT(*) AS count FROM BLOODBANK.헌혈자 WHERE 회원_ID = ?";
+        try (Connection connection = DBConnect.connect();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, memberId); // ID를 쿼리에 바인딩
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    int count = resultSet.getInt("count"); // 존재 여부 확인
+                    return count > 0; // 0보다 크면 해당 ID가 존재
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false; // 오류 발생 시 또는 데이터가 없으면 false 반환
+    }
 }

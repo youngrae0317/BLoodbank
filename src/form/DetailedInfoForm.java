@@ -37,7 +37,7 @@ public class DetailedInfoForm extends JFrame {
         // 회원 정보 패널
         JPanel memberInfoPanel = new JPanel(new GridBagLayout());
         memberInfoPanel.setBorder(BorderFactory.createTitledBorder("회원 정보"));
-        memberInfoPanel.setBounds(10, 70, 980, 200);
+        memberInfoPanel.setBounds(10, 70, 980, 250);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;

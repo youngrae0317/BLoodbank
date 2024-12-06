@@ -134,9 +134,14 @@ public class BloodRecordsForm extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String idText = idField.getText().trim(); // 회원 ID 입력값 가져오기
                 if (!idText.isEmpty()) { // ID가 비어있지 않다면
-                    System.out.println("회원 ID 전달: " + idText); // 디버깅 출력
-                    DetailedInfoForm detailedInfoForm = new DetailedInfoForm(idText); // DetailedInfoForm 호출
-                    detailedInfoForm.setVisible(true); // 창 표시
+                    boolean exists = RecordeDB.checkMemberExists(idText); // 회원 존재 여부 확인
+                    if (exists) {
+                        System.out.println("회원 ID 전달: " + idText); // 디버깅 출력
+                        DetailedInfoForm detailedInfoForm = new DetailedInfoForm(idText); // DetailedInfoForm 호출
+                        detailedInfoForm.setVisible(true); // 창 표시
+                    } else {
+                        JOptionPane.showMessageDialog(BloodRecordsForm.this, "해당 회원 ID가 존재하지 않습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                    }
                 } else {
                     JOptionPane.showMessageDialog(BloodRecordsForm.this, "회원 ID를 입력해주세요.", "경고", JOptionPane.WARNING_MESSAGE);
                 }
