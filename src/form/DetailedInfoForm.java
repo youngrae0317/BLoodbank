@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DetailedInfoForm extends JFrame {
-    private int selectedRecordId = -1; // 선택된 헌혈기록번호를 저장할 변수
+    private int selectedRecordId = -1; // 선호된 허핵기록번호를 저장할 변수
 
     public DetailedInfoForm(String memberId) {
         setTitle("상세 정보");
-        setSize(1010, 700);
+        setSize(1010, 750);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(null);
@@ -57,15 +57,15 @@ public class DetailedInfoForm extends JFrame {
 
         add(memberInfoPanel);
 
-        // DB에서 회원 정보 가져오기
+        // DB에서 회원 정보 검색
         populateMemberInfo(memberId, memberIdField, nameField, birthField, phoneField, genderField, bloodTypeField, addressField, donationCountField, lastDonationDateField, nextDonationDateField);
 
-        // 검사 결과 버튼 패널
+        // 검색 결과 버튼 패널
         JPanel resultButtonPanel = new JPanel();
         resultButtonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        resultButtonPanel.setBounds(10, 280, 980, 40);
-        JButton insertResultButton = new JButton("검사 결과 삽입");
-        JButton viewResultButton = new JButton("검사 결과 조회");
+        resultButtonPanel.setBounds(10, 330, 980, 40);
+        JButton insertResultButton = new JButton("검색 결과 삽입");
+        JButton viewResultButton = new JButton("검색 결과 조회");
         insertResultButton.setPreferredSize(new Dimension(150, 30));
         viewResultButton.setPreferredSize(new Dimension(150, 30));
         resultButtonPanel.add(insertResultButton);
@@ -91,18 +91,18 @@ public class DetailedInfoForm extends JFrame {
 
         // Comparator 설정
         sorter.setComparator(0, Comparator.comparingInt(o -> Integer.parseInt(o.toString()))); // 기록번호
-        sorter.setComparator(4, Comparator.comparingInt(o -> Integer.parseInt(o.toString().replace("ml", "").trim()))); // 헌혈량
-        sorter.setComparator(5, Comparator.comparing(o -> LocalDate.parse(o.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd")))); // 헌혈일자
+        sorter.setComparator(4, Comparator.comparingInt(o -> Integer.parseInt(o.toString().replace("ml", "").trim()))); // 허핵량
+        sorter.setComparator(5, Comparator.comparing(o -> LocalDate.parse(o.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd")))); // 허핵일자
         sorter.setComparator(7, Comparator.comparingInt(o -> Integer.parseInt(o.toString().replace("일", "").trim()))); // 보관유효기간
 
-        // 초기 정렬 키 설정 (기록번호 열을 내림차순으로 정렬)
+        // 최초 정렬 키 설정 (기록번호 열을 내림차순으로 정렬)
         List<RowSorter.SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.DESCENDING)); // 0번 열(기록번호)을 내림차순으로 정렬
         sorter.setSortKeys(sortKeys);
         sorter.sort(); // 정렬 적용
 
         JScrollPane tableScrollPane = new JScrollPane(table);
-        tableScrollPane.setBounds(10, 330, 980, 300);
+        tableScrollPane.setBounds(10, 380, 980, 300); // 테이블을 버튼 위에서 와로 내려뜨린 위치
         table.setFillsViewportHeight(true);
 
         add(tableScrollPane);
