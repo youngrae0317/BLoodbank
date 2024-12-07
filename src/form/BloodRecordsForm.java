@@ -96,16 +96,18 @@ public class BloodRecordsForm extends JFrame {
 
         add(centerPanel, BorderLayout.CENTER);
 
-        // 하단 패널: 삽입 버튼
+        // 하단 패널: 삽입 버튼, 새로고침 버튼
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         JButton insertButton = new JButton("삽입");
+        JButton refreshButton = new JButton("새로고침"); // 새로고침 버튼 추가
+        buttonPanel.add(refreshButton);
         buttonPanel.add(insertButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
         // 버튼 스타일 지정
         Color buttonColor = new Color(100, 149, 237);
-        JButton[] buttons = {insertButton, detailButton};
+        JButton[] buttons = {insertButton, detailButton, refreshButton};
         for (JButton button : buttons) {
             button.setBackground(buttonColor);
             button.setForeground(Color.WHITE);
@@ -157,6 +159,16 @@ public class BloodRecordsForm extends JFrame {
                 } else {
                     recordInsertForm.toFront();
                 }
+            }
+        });
+
+        // 새로고침 버튼 클릭 이벤트
+        refreshButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // 테이블 모델 초기화 후 다시 로드
+                tableModel.setRowCount(0);
+                RecordeDB.loadBloodRecords(tableModel, "헌혈기록번호", "ASC");
             }
         });
 
