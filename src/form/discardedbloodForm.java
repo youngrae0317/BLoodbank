@@ -49,7 +49,13 @@ public class discardedbloodForm extends JFrame {
 
         // 테이블 생성
         String[] columnNames = {"폐기_ID", "헌혈기록번호", "폐기일", "폐기사유"};
-        tableModel = new DefaultTableModel(columnNames, 0);
+        tableModel = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // 모든 셀 비활성화
+            }
+        };
+
         table = new JTable(tableModel);
         table.setRowHeight(30);
         table.getTableHeader().setFont(new Font("맑은 고딕", Font.BOLD, 14));
@@ -92,6 +98,7 @@ public class discardedbloodForm extends JFrame {
         List<DiscardedBlood> discardedBloodList = db.getAllDiscardedBlood(); // 모든 데이터 가져오기
 
         tableModel.setRowCount(0); // 기존 테이블 데이터 초기화
+        boolean found = false;
         for (DiscardedBlood blood : discardedBloodList) {
             if (String.valueOf(blood.헌혈기록번호).equals(searchKey)) { // 헌혈기록번호로 필터링
                 tableModel.addRow(new Object[]{
@@ -100,11 +107,13 @@ public class discardedbloodForm extends JFrame {
                         blood.폐기일,
                         blood.폐기사유
                 });
+                found = true;
             }
         }
 
-        if (tableModel.getRowCount() == 0) {
+        if (!found) {
             JOptionPane.showMessageDialog(this, "검색 결과가 없습니다.", "정보", JOptionPane.INFORMATION_MESSAGE);
+            loadDiscardedBloodData(); // 검색 결과 없을 시 모든 데이터 다시 로드
         }
     }
 

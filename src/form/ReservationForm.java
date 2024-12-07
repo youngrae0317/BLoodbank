@@ -85,10 +85,17 @@ public class ReservationForm extends JFrame {
         // 테이블 데이터
         String[] columnNames = { "예약번호", "회원ID", "예약일시", "예약이름", "예약상태", "담당직원ID" };
         tableModel = new DefaultTableModel(columnNames, 0);
-        JTable table = new JTable(tableModel);
+
+        JTable table = new JTable(tableModel) { //테이블 수정못하게
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // 모든 셀 수정 불가
+            }
+        };
         JScrollPane tableScrollPane = new JScrollPane(table);
         table.setFillsViewportHeight(true);
         centerPanel.add(tableScrollPane, BorderLayout.CENTER);
+
 
         add(centerPanel, BorderLayout.CENTER);
 
