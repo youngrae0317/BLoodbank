@@ -64,8 +64,8 @@ public class DetailedInfoForm extends JFrame {
         JPanel resultButtonPanel = new JPanel();
         resultButtonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         resultButtonPanel.setBounds(10, 330, 980, 40);
-        JButton insertResultButton = new JButton("검색 결과 삽입");
-        JButton viewResultButton = new JButton("검색 결과 조회");
+        JButton insertResultButton = new JButton("검사 결과 삽입");
+        JButton viewResultButton = new JButton("검사 결과 조회");
         insertResultButton.setPreferredSize(new Dimension(150, 30));
         viewResultButton.setPreferredSize(new Dimension(150, 30));
         resultButtonPanel.add(insertResultButton);
