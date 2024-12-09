@@ -66,7 +66,7 @@ public class TestResultDAO {
             conn.setAutoCommit(false); // 트랜잭션 시작
 
             // 트랜잭션 격리 수준 설정
-            conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+            conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 
             try (PreparedStatement selectStmt = conn.prepareStatement(selectQuery)) {
                 selectStmt.setInt(1, recordId);
