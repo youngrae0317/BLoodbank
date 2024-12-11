@@ -124,7 +124,7 @@ public class discardedbloodForm extends JFrame {
         button.setFont(new Font("맑은 고딕", Font.BOLD, 14));
     }
 
-    public static void main(String[] args) {
+   /* public static void main(String[] args) {
         SwingUtilities.invokeLater(discardedbloodForm::new);
-    }
+    }*/
 }

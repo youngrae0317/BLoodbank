@@ -160,7 +160,7 @@ public class Mainform {
         frame.setVisible(true);
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         // Event Dispatch Thread에서 GUI 생성
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -168,7 +168,7 @@ public class Mainform {
                 new Mainform();
             }
         });
-    }
+    }*/
 }
 
 /**

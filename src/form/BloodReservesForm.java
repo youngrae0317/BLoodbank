@@ -89,7 +89,7 @@ public class BloodReservesForm extends JFrame {
 
         for (String type : bloodTypesToInclude) {
             System.out.println("Fetching data for: " + type); // 디버깅 출력
-            List<Object[]> data = reservesDB.getBloodReserves(type);
+            List<Object[]> data = reservesDB.getBloodReserves(type);//데이터
 
             for (Object[] row : data) {
                 String bloodType = (String) row[0];
@@ -241,7 +241,7 @@ public class BloodReservesForm extends JFrame {
 
 
 
-    public static void main(String[] args) {
+/*    public static void main(String[] args) {
         new BloodReservesForm();
-    }
+    }*/
 }
